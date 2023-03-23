@@ -1,0 +1,12 @@
+{
+  "config": {
+    "type": "SIN",
+    "frequency": 123.0,
+    "amplitude": 456.23
+  },
+  "mode": {
+    "activeMode": "BURST",
+    "param1": 100,
+    "param2": 200
+  }
+}
