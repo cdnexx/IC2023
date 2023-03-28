@@ -9,13 +9,11 @@ class Ui_MainWindow(object):
 
     def __init__(self, initial_type: str, initial_freq: float, initial_ampl: float) -> None:
         super().__init__()
-        print(initial_type)
         self.__initial_type = initial_type
         self.__initial_freq = initial_freq
         self.__initial_ampl = initial_ampl
 
     def setupUi(self, MainWindow):
-        print(self.__initial_ampl)
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(470, 240)
@@ -28,19 +26,17 @@ class Ui_MainWindow(object):
 
         self.type_combo = QtWidgets.QComboBox(self.config_group)
         self.type_combo.setGeometry(QtCore.QRect(10, 40, 91, 22))
-        self.type_combo.setObjectName("trype_combo")
+        self.type_combo.setObjectName("type_combo")
         self.type_combo.addItem("")
         self.type_combo.addItem("")
         self.type_combo.addItem("")
 
         self.freq_input = QtWidgets.QLineEdit(self.config_group)
         self.freq_input.setGeometry(QtCore.QRect(120, 40, 91, 20))
-        self.freq_input.setProperty("value", self.__initial_freq)
         self.freq_input.setObjectName("freq_input")
 
         self.ampl_input = QtWidgets.QLineEdit(self.config_group)
         self.ampl_input.setGeometry(QtCore.QRect(230, 40, 91, 20))
-        self.ampl_input.setProperty("value", self.__initial_ampl)
         self.ampl_input.setObjectName("ampl_input")
 
         self.type_label = QtWidgets.QLabel(self.config_group)
@@ -83,7 +79,7 @@ class Ui_MainWindow(object):
         self.local_button = QtWidgets.QPushButton(self.save_group)
         self.local_button.setGeometry(QtCore.QRect(10, 20, 91, 23))
         self.local_button.setObjectName("local_button")
-        self.local_button.clicked.connect(self.save_config)
+        self.local_button.clicked.connect(self.save_config_local)
 
         self.memory_button = QtWidgets.QPushButton(self.save_group)
         self.memory_button.setGeometry(QtCore.QRect(10, 50, 91, 23))
@@ -106,7 +102,7 @@ class Ui_MainWindow(object):
         self.exit_button = QtWidgets.QPushButton(self.centralwidget)
         self.exit_button.setGeometry(QtCore.QRect(20, 190, 91, 23))
         self.exit_button.setObjectName("exit_button")
-        self.exit_button.clicked.connect(self.query_params)
+        self.exit_button.clicked.connect(self.save_exit)
 
         self.send_button = QtWidgets.QPushButton(self.centralwidget)
         self.send_button.setGeometry(QtCore.QRect(370, 190, 91, 23))
@@ -134,6 +130,12 @@ class Ui_MainWindow(object):
         self.type_combo.setItemText(0, _translate("MainWindow", "SIN"))
         self.type_combo.setItemText(1, _translate("MainWindow", "PULSE"))
         self.type_combo.setItemText(2, _translate("MainWindow", "ARB"))
+
+        # Set config values
+        self.type_combo.setCurrentText(self.__initial_type)
+        self.freq_input.setText(str(self.__initial_freq))
+        self.ampl_input.setText(str(self.__initial_ampl))
+
         self.type_label.setText(_translate("MainWindow", "Tipo"))
         self.freq_label.setText(_translate("MainWindow", "Frecuencia [Hz]"))
         self.ampl_label.setText(_translate("MainWindow", "Amplitud [V]"))
@@ -157,10 +159,10 @@ class Ui_MainWindow(object):
     # ------------------ Getters ------------------
     def get_type(self) -> float:
         return self.type_combo.currentText().upper()
-    
+
     def get_freq(self) -> float:
         return float(self.freq_input.text())
-    
+
     def get_ampl(self) -> float:
         return float(self.ampl_input.text())
 
@@ -188,6 +190,8 @@ class Ui_MainWindow(object):
         self.DG1022.write(f'VOLT {amplitude}')
         time.sleep(0.5)
 
+        self.query_params()
+
     def query_params(self):
         self.DG1022.write('APPL?')
         time.sleep(0.5)
@@ -195,16 +199,28 @@ class Ui_MainWindow(object):
 
     def load_config(self):
         return
-    
-    def save_config(self):
+
+    def save(self, filename: str):
         import json
-        with open("config.json", "r") as config_file:
+        file_route = f"configs/{filename}.json"
+        with open(file_route, "r") as config_file:
             config = json.load(config_file)
         config["config"]["type"] = self.get_type()
         config["config"]["frequency"] = self.get_freq()
         config["config"]["amplitude"] = self.get_ampl()
-        with open("config.json", "w") as config_file:
+        with open(file_route, "w") as config_file:
             json.dump(config, config_file, indent=2)
+
+    # Save last config and exit.
+    def save_exit(self):
+        self.save("last_config")
+        exit()
+
+    def save_config_local(self):
+        filename = "test_config"
+        if filename == "":
+            filename = "date"
+        self.save(f"{filename}")
 
     # rm = pyvisa.ResourceManager()
     # DG1022 = rm.open_resource(

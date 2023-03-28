@@ -1,0 +1,12 @@
+{
+  "config": {
+    "type": "PULSE",
+    "frequency": 1.0,
+    "amplitude": 2.0
+  },
+  "mode": {
+    "activeMode": "BURST",
+    "param1": 100,
+    "param2": 200
+  }
+}

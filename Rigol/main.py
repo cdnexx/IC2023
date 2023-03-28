@@ -4,7 +4,7 @@ import json
 
 
 def read_config():
-    with open("config.json") as config_file:
+    with open("configs/last_config.json") as config_file:
         config = json.load(config_file)
     func = config["config"]["type"]
     freq = config["config"]["frequency"]
@@ -24,3 +24,5 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+# Todos los tipos de función pueden estar en modo BURST/SWEEP

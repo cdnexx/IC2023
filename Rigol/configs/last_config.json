@@ -1,8 +1,8 @@
 {
   "config": {
-    "type": "SIN",
-    "frequency": 123.0,
-    "amplitude": 456.23
+    "type": "PULSE",
+    "frequency": 4.0,
+    "amplitude": 8.0
   },
   "mode": {
     "activeMode": "BURST",
