@@ -26,3 +26,10 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 
 # Todos los tipos de función pueden estar en modo BURST/SWEEP
+
+# Sweep solo SIN
+# Continuo solo SIN y arb
+
+# Rangos de frecuencia y amplitud
+# Crear caja de retorno
+# Crear lista de comandos por enviar y enviarlos con delay de x segs

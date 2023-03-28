@@ -1,0 +1,12 @@
+{
+  "config": {
+    "type": "",
+    "frequency": 32.0,
+    "amplitude": 11.0
+  },
+  "mode": {
+    "activeMode": "",
+    "param1": 0,
+    "param2": 0
+  }
+}

@@ -3,6 +3,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pyvisa
 import time
+import os
+import json
 
 
 class Ui_MainWindow(object):
@@ -27,9 +29,6 @@ class Ui_MainWindow(object):
         self.type_combo = QtWidgets.QComboBox(self.config_group)
         self.type_combo.setGeometry(QtCore.QRect(10, 40, 91, 22))
         self.type_combo.setObjectName("type_combo")
-        self.type_combo.addItem("")
-        self.type_combo.addItem("")
-        self.type_combo.addItem("")
 
         self.freq_input = QtWidgets.QLineEdit(self.config_group)
         self.freq_input.setGeometry(QtCore.QRect(120, 40, 91, 20))
@@ -92,8 +91,12 @@ class Ui_MainWindow(object):
         self.load_combo = QtWidgets.QComboBox(self.load_group)
         self.load_combo.setGeometry(QtCore.QRect(10, 20, 91, 22))
         self.load_combo.setObjectName("load_combo")
+
+        # Create an empty item and then add an item
+        # for each .json file in the configs folder
         self.load_combo.addItem("")
-        self.load_combo.addItem("")
+        for file in self.list_saved_configs():
+            self.load_combo.addItem(file)
 
         self.load_button = QtWidgets.QPushButton(self.load_group)
         self.load_button.setGeometry(QtCore.QRect(10, 50, 91, 23))
@@ -150,7 +153,14 @@ class Ui_MainWindow(object):
         self.load_group.setTitle(_translate(
             "MainWindow", "Cargar configuración"))
 
+        # Set text value for the default option and then
+        # set the remaining text values as the filename.
         self.load_combo.setItemText(0, _translate("MainWindow", "-"))
+        counter = 1
+        for file in self.list_saved_configs():
+            self.load_combo.setItemText(
+                counter, _translate("MainWindow", file))
+            counter += 1
 
         self.load_button.setText(_translate("MainWindow", "Cargar"))
         self.exit_button.setText(_translate("MainWindow", "Salir"))
@@ -201,7 +211,6 @@ class Ui_MainWindow(object):
         return
 
     def save(self, filename: str):
-        import json
         file_route = f"configs/{filename}.json"
         with open(file_route, "r") as config_file:
             config = json.load(config_file)
@@ -216,11 +225,46 @@ class Ui_MainWindow(object):
         self.save("last_config")
         exit()
 
+    def empty_config_file(self, filename):
+        initial_content = {
+            "config": {
+                "type": "",
+                "frequency": 0.0,
+                "amplitude": 0.0
+            },
+            "mode": {
+                "activeMode": "",
+                "param1": 0,
+                "param2": 0
+            }
+        }
+        # Create empty file
+        file = open(f"configs/{filename}.json", "w+")
+        file.close()
+
+        # "Load" initial content to json file
+        json_object = json.dumps(initial_content, indent=4)
+        with open(f"configs/{filename}.json", "w") as outfile:
+            outfile.write(json_object)
+
     def save_config_local(self):
-        filename = "test_config"
+        filename = "hola_config"
         if filename == "":
             filename = "date"
-        self.save(f"{filename}")
+        try:
+            self.save(f"{filename}")
+        except FileNotFoundError:
+            self.empty_config_file(filename)
+            self.save(f"{filename}")
+
+    def list_saved_configs(self):
+        directory = os.listdir('configs')
+        files = []
+        for file in directory:
+            if '.json' in file:
+                # Append the filename to files list without file extension.
+                files.append(file[:file.find('.')])
+        return files
 
     # rm = pyvisa.ResourceManager()
     # DG1022 = rm.open_resource(
