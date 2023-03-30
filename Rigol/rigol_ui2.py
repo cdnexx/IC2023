@@ -1,6 +1,7 @@
 """Rigol DG1022 control UI."""
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from save_dialog import Ui_Dialog as SaveDialog
 import pyvisa
 import time
 import os
@@ -29,6 +30,9 @@ class Ui_MainWindow(object):
         self.type_combo = QtWidgets.QComboBox(self.config_group)
         self.type_combo.setGeometry(QtCore.QRect(10, 40, 91, 22))
         self.type_combo.setObjectName("type_combo")
+        self.type_combo.addItem("")
+        self.type_combo.addItem("")
+        self.type_combo.addItem("")
 
         self.freq_input = QtWidgets.QLineEdit(self.config_group)
         self.freq_input.setGeometry(QtCore.QRect(120, 40, 91, 20))
@@ -78,7 +82,7 @@ class Ui_MainWindow(object):
         self.local_button = QtWidgets.QPushButton(self.save_group)
         self.local_button.setGeometry(QtCore.QRect(10, 20, 91, 23))
         self.local_button.setObjectName("local_button")
-        self.local_button.clicked.connect(self.save_config_local)
+        self.local_button.clicked.connect(self.open_save_dialog)
 
         self.memory_button = QtWidgets.QPushButton(self.save_group)
         self.memory_button.setGeometry(QtCore.QRect(10, 50, 91, 23))
@@ -153,20 +157,34 @@ class Ui_MainWindow(object):
         self.load_group.setTitle(_translate(
             "MainWindow", "Cargar configuración"))
 
-        # Set text value for the default option and then
-        # set the remaining text values as the filename.
-        self.load_combo.setItemText(0, _translate("MainWindow", "-"))
-        counter = 1
-        for file in self.list_saved_configs():
-            self.load_combo.setItemText(
-                counter, _translate("MainWindow", file))
-            counter += 1
+        # # Set text value for the default option and then
+        # # set the remaining text values as the filename.
+        # self.load_combo.setItemText(0, _translate("MainWindow", "-"))
+        # counter = 1
+        # for file in self.list_saved_configs():
+        #     self.load_combo.setItemText(
+        #         counter, _translate("MainWindow", file))
+        #     counter += 1
 
         self.load_button.setText(_translate("MainWindow", "Cargar"))
         self.exit_button.setText(_translate("MainWindow", "Salir"))
         self.send_button.setText(_translate("MainWindow", "Enviar"))
 
+    # ------------------ Windows ------------------
+
+    def open_save_dialog(self):
+        pre_file_list = self.list_saved_configs()
+        dialog = QtWidgets.QDialog()
+        dialog.ui = SaveDialog(self.save)
+        dialog.ui.setupUi(dialog)
+        dialog.exec_()
+
+        # Once the dialog window is closed, config list is updated
+        post_file_list = self.list_saved_configs()
+        self.update_saved_list(pre_file_list, post_file_list)
+
     # ------------------ Getters ------------------
+
     def get_type(self) -> float:
         return self.type_combo.currentText().upper()
 
@@ -225,37 +243,18 @@ class Ui_MainWindow(object):
         self.save("last_config")
         exit()
 
-    def empty_config_file(self, filename):
-        initial_content = {
-            "config": {
-                "type": "",
-                "frequency": 0.0,
-                "amplitude": 0.0
-            },
-            "mode": {
-                "activeMode": "",
-                "param1": 0,
-                "param2": 0
-            }
-        }
-        # Create empty file
-        file = open(f"configs/{filename}.json", "w+")
-        file.close()
-
-        # "Load" initial content to json file
-        json_object = json.dumps(initial_content, indent=4)
-        with open(f"configs/{filename}.json", "w") as outfile:
-            outfile.write(json_object)
-
-    def save_config_local(self):
-        filename = "hola_config"
-        if filename == "":
-            filename = "date"
-        try:
-            self.save(f"{filename}")
-        except FileNotFoundError:
-            self.empty_config_file(filename)
-            self.save(f"{filename}")
+    def update_saved_list(self, pre, post):
+        counter = 0
+        for file in post:
+            try:
+                if file == pre[counter]:
+                    counter += 1
+                else:
+                    self.load_combo.addItem(file)
+                    print(f"nuevo archivo {file}")
+            except IndexError:
+                self.load_combo.addItem(file)
+                print(f"nuevo archivo {file}")
 
     def list_saved_configs(self):
         directory = os.listdir('configs')
@@ -269,13 +268,3 @@ class Ui_MainWindow(object):
     # rm = pyvisa.ResourceManager()
     # DG1022 = rm.open_resource(
     #     'USB0::0x0400::0x09C4::DG1D200200107::INSTR')  # Rigol DG1022
-
-
-# if __name__ == "__main__":
-#     import sys
-#     app = QtWidgets.QApplication(sys.argv)
-#     MainWindow = QtWidgets.QMainWindow()
-#     ui = Ui_MainWindow()
-#     ui.setupUi(MainWindow)
-#     MainWindow.show()
-#     sys.exit(app.exec_())
