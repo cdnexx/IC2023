@@ -254,7 +254,6 @@ class Ui_MainWindow(object):
                     print(f"nuevo archivo {file}")
             except IndexError:
                 self.load_combo.addItem(file)
-                print(f"nuevo archivo {file}")
 
     def list_saved_configs(self):
         directory = os.listdir('configs')
