@@ -1,12 +1,12 @@
 {
   "config": {
-    "type": "",
-    "frequency": 32.0,
-    "amplitude": 11.0
+    "type": "Pulse",
+    "frequency": 123.0,
+    "amplitude": 456.0
   },
   "mode": {
-    "activeMode": "",
-    "param1": 0,
-    "param2": 0
+    "activeMode": "Burst",
+    "param1": 78.0,
+    "param2": 910.0
   }
 }

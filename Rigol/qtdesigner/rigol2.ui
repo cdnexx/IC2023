@@ -32,7 +32,7 @@
     <property name="title">
      <string>Configuración</string>
     </property>
-    <widget class="QComboBox" name="trype_combo">
+    <widget class="QComboBox" name="type_combo">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -378,7 +378,7 @@
      <x>0</x>
      <y>0</y>
      <width>470</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -413,11 +413,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>82</x>
-     <y>176</y>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>148</x>
-     <y>159</y>
+     <y>146</y>
     </hint>
    </hints>
   </connection>
@@ -429,11 +429,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>78</x>
-     <y>175</y>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
      <x>255</x>
-     <y>157</y>
+     <y>146</y>
     </hint>
    </hints>
   </connection>
