@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
         self.send_button = QtWidgets.QPushButton(self.centralwidget)
         self.send_button.setGeometry(QtCore.QRect(370, 230, 91, 23))
         self.send_button.setObjectName("send_button")
-        self.send_button.clicked.connect(self.get_parameters)
+        self.send_button.clicked.connect(self.send_configs)
 
         self.return_group = QtWidgets.QGroupBox(self.centralwidget)
         self.return_group.setGeometry(QtCore.QRect(10, 170, 451, 51))
@@ -152,9 +152,6 @@ class Ui_MainWindow(object):
         self.action_Local.setObjectName("action_Local")
         self.action_Memoria = QtWidgets.QAction(MainWindow)
         self.action_Memoria.setObjectName("action_Memoria")
-
-        # Load last config values
-        self.load_config("last_config")
 
         # Connect device
         self.connect_device()
@@ -194,6 +191,9 @@ class Ui_MainWindow(object):
         self.action_Cargar.setText(_translate("MainWindow", "&Cargar"))
         self.action_Local.setText(_translate("MainWindow", "&Local"))
         self.action_Memoria.setText(_translate("MainWindow", "&Memoria"))
+
+        # Load last config values
+        self.load_config("last_config")
         self.update_param_labels()
 
     # ------------------ Windows ------------------
@@ -244,7 +244,33 @@ class Ui_MainWindow(object):
             # Ventana de error
 
     def send_configs(self):
-        return
+        wave = {
+            "Sine": "SIN",
+            "Pulse": "PULS",
+            "Arbitrary": "USER"
+        }
+        mode = {
+            "Continuo": "",
+            "Sweep": "SWE",
+            "Burst": "BURS"
+        }
+
+        commands = []
+        # Set wave type, frequency and amplitude
+        commands.append(
+            f"APPL:{wave[self.get_type()]} {self.get_freq()},{self.get_ampl()}")
+        # Set the selected mode
+        commands.append(f"{mode[self.get_mode()]}:STAT ON")
+
+        if self.get_mode() == "Sweep":
+            commands.append(" ")
+        elif self.get_mode() == "Burst":
+            # Set cycle number. min=1 max=50000 || infinite=INF
+            commands.append(f"BURS:NCYC {self.get_param1()}")
+            # Set the period of burst. min=0.000001 max=500
+            commands.append(f"BURS:INT:PER {self.get_param2()}")
+
+        print(commands)
 
     def get_parameters(self):
         func_type = self.type_combo.currentText().upper()
@@ -265,9 +291,13 @@ class Ui_MainWindow(object):
         self.return_field.setStyleSheet(f"background: {color};")
 
     def query_params(self):
-        self.dg1022.write('APPL?')
-        time.sleep(0.5)
-        self.message_return(f"{self.dg1022.read()}")
+        try:
+            self.dg1022.write('APPL?')
+            time.sleep(0.5)
+            self.message_return(f"{self.dg1022.read()}")
+        except AttributeError:
+            self.message_return(
+                "Sin conexión con el dispositivo.", self.red_alert)
 
     def load_config(self, config_name):
         """Load selected config"""
@@ -347,7 +377,7 @@ class Ui_MainWindow(object):
             self.param2.setVisible(True)
         if self.mode_combo.currentText() == "Burst":
             self.param1_label.setText("Ciclos")
-            self.param2_label.setText("Período")
+            self.param2_label.setText("Período [s]")
             self.param1.setEnabled(True)
             self.param2.setEnabled(True)
             self.param1.setVisible(True)

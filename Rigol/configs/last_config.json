@@ -1,12 +1,12 @@
 {
   "config": {
-    "type": "Arbitrary",
-    "frequency": 998.0,
-    "amplitude": 123.0
+    "type": "Pulse",
+    "frequency": 99.0,
+    "amplitude": 22.0
   },
   "mode": {
-    "activeMode": "Sweep",
-    "param1": 45.0,
-    "param2": 12.0
+    "activeMode": "Burst",
+    "param1": 4.0,
+    "param2": 7.0
   }
 }
