@@ -273,16 +273,23 @@ class Ui_MainWindow(object):
         else:
             commands.append(f"{mode[self.get_mode()]}:STAT ON")
 
-        # Config sweep and burst
-        if self.get_mode() == "Sweep":
-            commands.append(" ")
-        elif self.get_mode() == "Burst":
-            # Set cycle number. min=1 max=50000 || infinite=INF
-            commands.append(f"BURS:NCYC {self.get_param1()}")
-            # Set the period of burst. min=0.000001 max=500
-            commands.append(f"BURS:INT:PER {self.get_param2()}")
+        # # Config sweep and burst
+        # if self.get_mode() == "Sweep":
+        #     commands.append(" ")
+        # elif self.get_mode() == "Burst":
+        #     # Set cycle number. min=1 max=50000 || infinite=INF
+        #     commands.append(f"BURS:NCYC {self.get_param1()}")
+        #     # Set the period of burst. min=0.000001 max=500
+        #     commands.append(f"BURS:INT:PER {self.get_param2()}")
 
-        print(commands)
+        for cmd in commands:
+            self.send_command(cmd)
+
+        self.message_return('Configuración enviada.', self.green_alert)
+
+    def send_and_run(self):
+        self.send_configs()
+        self.send_command('OUTP ON')
 
     def get_parameters(self):
         func_type = self.type_combo.currentText().upper()

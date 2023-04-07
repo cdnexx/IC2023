@@ -18,7 +18,6 @@ if __name__ == "__main__":
 # Continuo solo SIN y arb
 
 # Rangos de frecuencia y amplitud
-
 # boton enviar y aplicar (run)
 
 # Start y stop del sweep? -> FREQ
