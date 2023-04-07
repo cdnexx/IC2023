@@ -1,8 +1,8 @@
 {
   "config": {
     "type": "Sine",
-    "frequency": 6667.0,
-    "amplitude": 99.0
+    "frequency": 99.0,
+    "amplitude": 22.0
   },
   "mode": {
     "activeMode": "Sweep",

@@ -153,9 +153,6 @@ class Ui_MainWindow(object):
         self.action_Memoria = QtWidgets.QAction(MainWindow)
         self.action_Memoria.setObjectName("action_Memoria")
 
-        # Connect device
-        self.connect_device()
-
         self.retranslateUi(MainWindow)
         self.mode_combo.currentTextChanged['QString'].connect(
             self.update_param_labels)
@@ -195,6 +192,9 @@ class Ui_MainWindow(object):
         # Load last config values
         self.load_config("last_config")
         self.update_param_labels()
+
+        # Connect device
+        self.connect_device()
 
     # ------------------ Windows ------------------
 
@@ -243,6 +243,13 @@ class Ui_MainWindow(object):
             return None
             # Ventana de error
 
+    def send_command(self, cmd):
+        self.dg1022.write(cmd)
+        delay = 0.001 * len(cmd)
+        time.sleep(delay)
+        if cmd[-1] == '?':
+            return self.dg1022.read()
+
     def send_configs(self):
         wave = {
             "Sine": "SIN",
@@ -260,8 +267,13 @@ class Ui_MainWindow(object):
         commands.append(
             f"APPL:{wave[self.get_type()]} {self.get_freq()},{self.get_ampl()}")
         # Set the selected mode
-        commands.append(f"{mode[self.get_mode()]}:STAT ON")
+        if self.get_mode() == "Continuo":
+            commands.append("SWE:STAT OFF")
+            commands.append("BURS:STAT OFF")
+        else:
+            commands.append(f"{mode[self.get_mode()]}:STAT ON")
 
+        # Config sweep and burst
         if self.get_mode() == "Sweep":
             commands.append(" ")
         elif self.get_mode() == "Burst":
@@ -290,14 +302,31 @@ class Ui_MainWindow(object):
         self.return_field.setText(msg)
         self.return_field.setStyleSheet(f"background: {color};")
 
+    def format_query(self, apply, sweep, burst):
+        props = apply.split(',')
+        func = props[0][5:]
+        freq = float(props[1])
+        ampl = float(props[2])
+        mode = ''
+        if 'OFF' in sweep and 'OFF' in burst:
+            mode = 'Continuo'
+        elif 'ON' in sweep:
+            mode = 'Sweep'
+        elif 'ON' in burst:
+            mode = 'Burst'
+
+        return f'Tipo: {func}, Frecuencia: {freq} Hz, Amplitud: {ampl} V, Modo: {mode}'
+
     def query_params(self):
         try:
-            self.dg1022.write('APPL?')
-            time.sleep(0.5)
-            self.message_return(f"{self.dg1022.read()}")
+            apply = self.send_command('APPL?')
+            sweep = self.send_command('SWE:STAT?')
+            burst = self.send_command('BURS:STAT?')
+            self.message_return(self.format_query(
+                apply, sweep, burst), self.green_alert)
         except AttributeError:
             self.message_return(
-                "Sin conexión con el dispositivo.", self.red_alert)
+                "Error al realizar la consulta.", self.red_alert)
 
     def load_config(self, config_name):
         """Load selected config"""
@@ -325,8 +354,13 @@ class Ui_MainWindow(object):
         config["config"]["frequency"] = self.get_freq()
         config["config"]["amplitude"] = self.get_ampl()
         config["mode"]["activeMode"] = self.get_mode()
-        config["mode"]["param1"] = self.get_param1()
-        config["mode"]["param2"] = self.get_param2()
+        if self.get_mode() == "Continuo":
+            config["mode"]["param1"] = 0
+            config["mode"]["param2"] = 0
+        else:
+            config["mode"]["param1"] = self.get_param1()
+            config["mode"]["param2"] = self.get_param2()
+
         with open(file_route, "w") as config_file:
             json.dump(config, config_file, indent=2)
 
@@ -385,10 +419,13 @@ class Ui_MainWindow(object):
 
     def connect_device(self, device='USB0::0x0400::0x09C4::DG1D200200107::INSTR'):
         """Connect the device"""
-        rm = pyvisa.ResourceManager()
         try:
+            rm = pyvisa.ResourceManager()
             self.dg1022 = rm.open_resource(device)
             self.message_return(f"Conectado a: {device}", self.green_alert)
         except pyvisa.errors.VisaIOError:
+            self.message_return(
+                "Error al conectar con el dispositivo.", self.red_alert)
+        except ValueError:
             self.message_return(
                 "Error al conectar con el dispositivo.", self.red_alert)

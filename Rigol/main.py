@@ -18,7 +18,8 @@ if __name__ == "__main__":
 # Continuo solo SIN y arb
 
 # Rangos de frecuencia y amplitud
-# Crear lista de comandos por enviar y enviarlos con delay de x segs
 
-# Cual es el modo conitnuo?
-# Sweep en Linear o Log?
+# boton enviar y aplicar (run)
+
+# Start y stop del sweep? -> FREQ
+# SWEEP TIME, SPACING

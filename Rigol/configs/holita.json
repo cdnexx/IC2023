@@ -1,0 +1,12 @@
+{
+  "config": {
+    "type": "Pulse",
+    "frequency": 34.0,
+    "amplitude": 23.0
+  },
+  "mode": {
+    "activeMode": "Continuo",
+    "param1": 0,
+    "param2": 0
+  }
+}
