@@ -1,0 +1,14 @@
+{
+  "config": {
+    "type": "Pulse",
+    "frequency": 123.0,
+    "amplitude": 456.0
+  },
+  "mode": {
+    "activeMode": "Sweep",
+    "param1": 77.0,
+    "param2": 88.0,
+    "param3": 333.0,
+    "param4": "Log"
+  }
+}

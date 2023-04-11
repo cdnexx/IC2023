@@ -58,20 +58,20 @@ class Ui_MainWindow(object):
         self.mode_group.setTitle("")
         self.mode_group.setObjectName("mode_group")
         self.param2 = QtWidgets.QLineEdit(self.mode_group)
-        self.param2.setGeometry(QtCore.QRect(230, 30, 91, 20))
+        self.param2.setGeometry(QtCore.QRect(150, 30, 51, 20))
         self.param2.setObjectName("param2")
         self.param2_label = QtWidgets.QLabel(self.mode_group)
-        self.param2_label.setGeometry(QtCore.QRect(230, 10, 91, 16))
+        self.param2_label.setGeometry(QtCore.QRect(150, 10, 71, 16))
         self.param2_label.setObjectName("param2_label")
         self.param1_label = QtWidgets.QLabel(self.mode_group)
-        self.param1_label.setGeometry(QtCore.QRect(120, 10, 91, 16))
+        self.param1_label.setGeometry(QtCore.QRect(90, 10, 51, 16))
         self.param1_label.setObjectName("param1_label")
         self.param1 = QtWidgets.QLineEdit(self.mode_group)
-        self.param1.setGeometry(QtCore.QRect(120, 30, 91, 20))
+        self.param1.setGeometry(QtCore.QRect(90, 30, 51, 20))
         self.param1.setObjectName("param1")
 
         self.mode_combo = QtWidgets.QComboBox(self.mode_group)
-        self.mode_combo.setGeometry(QtCore.QRect(10, 30, 91, 22))
+        self.mode_combo.setGeometry(QtCore.QRect(10, 30, 71, 22))
         self.mode_combo.setObjectName("mode_combo")
         self.mode_combo.addItem("")
         self.mode_combo.addItem("")
@@ -79,6 +79,21 @@ class Ui_MainWindow(object):
         self.mode_label = QtWidgets.QLabel(self.mode_group)
         self.mode_label.setGeometry(QtCore.QRect(10, 10, 55, 16))
         self.mode_label.setObjectName("mode_label")
+
+        self.param3 = QtWidgets.QLineEdit(self.mode_group)
+        self.param3.setGeometry(QtCore.QRect(210, 30, 51, 20))
+        self.param3.setObjectName("param3")
+        self.param3_label = QtWidgets.QLabel(self.mode_group)
+        self.param3_label.setGeometry(QtCore.QRect(210, 10, 51, 16))
+        self.param3_label.setObjectName("param3_label")
+        self.param4_label = QtWidgets.QLabel(self.mode_group)
+        self.param4_label.setGeometry(QtCore.QRect(270, 10, 51, 16))
+        self.param4_label.setObjectName("param4_label")
+        self.param4_combo = QtWidgets.QComboBox(self.mode_group)
+        self.param4_combo.setGeometry(QtCore.QRect(270, 30, 51, 22))
+        self.param4_combo.setObjectName("param4_combo")
+        self.param4_combo.addItem("")
+        self.param4_combo.addItem("")
 
         self.save_group = QtWidgets.QGroupBox(self.centralwidget)
         self.save_group.setGeometry(QtCore.QRect(350, 90, 111, 81))
@@ -131,8 +146,14 @@ class Ui_MainWindow(object):
         self.return_field.setReadOnly(True)
         self.return_field.setPlaceholderText("")
         self.return_field.setObjectName("return_field")
+
+        self.run_button = QtWidgets.QPushButton(self.centralwidget)
+        self.run_button.setGeometry(QtCore.QRect(270, 230, 91, 23))
+        self.run_button.setObjectName("run_button")
+        self.run_button.clicked.connect(self.send_and_run)
+
         self.query_button = QtWidgets.QPushButton(self.centralwidget)
-        self.query_button.setGeometry(QtCore.QRect(270, 230, 91, 23))
+        self.query_button.setGeometry(QtCore.QRect(170, 230, 91, 23))
         self.query_button.setObjectName("query_button")
         self.query_button.clicked.connect(self.query_params)
 
@@ -174,6 +195,10 @@ class Ui_MainWindow(object):
         self.mode_combo.setItemText(1, _translate("MainWindow", "Sweep"))
         self.mode_combo.setItemText(2, _translate("MainWindow", "Burst"))
         self.mode_label.setText(_translate("MainWindow", "Modo"))
+        self.param3_label.setText(_translate("MainWindow", "Tiempo"))
+        self.param4_label.setText(_translate("MainWindow", "Spacing"))
+        self.param4_combo.setItemText(0, _translate("MainWindow", "Linear"))
+        self.param4_combo.setItemText(1, _translate("MainWindow", "Log"))
         self.save_group.setTitle(_translate("MainWindow", "Guardar"))
         self.local_button.setText(_translate("MainWindow", "Local"))
         self.memory_button.setText(_translate("MainWindow", "Memoria"))
@@ -184,6 +209,7 @@ class Ui_MainWindow(object):
         self.exit_button.setText(_translate("MainWindow", "Salir"))
         self.send_button.setText(_translate("MainWindow", "Enviar"))
         self.return_group.setTitle(_translate("MainWindow", "Retorno"))
+        self.run_button.setText(_translate("MainWindow", "Run"))
         self.query_button.setText(_translate("MainWindow", "Consultar"))
         self.action_Cargar.setText(_translate("MainWindow", "&Cargar"))
         self.action_Local.setText(_translate("MainWindow", "&Local"))
@@ -229,11 +255,17 @@ class Ui_MainWindow(object):
     def get_param2(self) -> float:
         return float(self.param2.text())
 
+    def get_param3(self) -> float:
+        return float(self.param3.text())
+
+    def get_param4(self) -> str:
+        return self.param4_combo.currentText()
+
     # ------------------ Methods ------------------
 
     def verify_input(self, element) -> float | None:
         """Return the value if it's a number
-           Otherwise, clears the input and return None 
+           Otherwise, clears the input and return None
         """
         try:
             return float(element.text())
@@ -281,15 +313,20 @@ class Ui_MainWindow(object):
         #     commands.append(f"BURS:NCYC {self.get_param1()}")
         #     # Set the period of burst. min=0.000001 max=500
         #     commands.append(f"BURS:INT:PER {self.get_param2()}")
-
-        for cmd in commands:
-            self.send_command(cmd)
-
-        self.message_return('Configuración enviada.', self.green_alert)
+        try:
+          for cmd in commands:
+                self.send_command(cmd)
+            self.message_return('Configuración enviada.', self.green_alert)
+        except:
+            self.message_return("Error al enviar la configuración", self.red_alert)
 
     def send_and_run(self):
-        self.send_configs()
-        self.send_command('OUTP ON')
+        try:
+            self.send_configs()
+            self.send_command('OUTP ON')
+        except:
+            self.message_return(
+                "Error al realizar la opreación", self.red_alert)
 
     def get_parameters(self):
         func_type = self.type_combo.currentText().upper()
@@ -346,7 +383,8 @@ class Ui_MainWindow(object):
             self.mode_combo.setCurrentText(config["mode"]["activeMode"])
             self.param1.setText(str(config["mode"]["param1"]))
             self.param2.setText(str(config["mode"]["param2"]))
-
+            self.param3.setText(str(config["mode"]["param3"]))
+            self.param4_combo.setCurrentText(config["mode"]["param4"])
             # Set load combo on default value
             self.load_combo.setCurrentText("-")
 
@@ -367,6 +405,9 @@ class Ui_MainWindow(object):
         else:
             config["mode"]["param1"] = self.get_param1()
             config["mode"]["param2"] = self.get_param2()
+        if self.get_mode() == "Sweep":
+            config["mode"]["param3"] = self.get_param3()
+            config["mode"]["param4"] = self.get_param4()
 
         with open(file_route, "w") as config_file:
             json.dump(config, config_file, indent=2)
@@ -405,24 +446,43 @@ class Ui_MainWindow(object):
         if self.mode_combo.currentText() == "Continuo":
             self.param1_label.setText("")
             self.param2_label.setText("")
+            self.param3_label.setText("")
+            self.param4_label.setText("")
             self.param1.setEnabled(False)
             self.param2.setEnabled(False)
+            self.param3.setEnabled(False)
+            self.param4_combo.setEnabled(False)
             self.param1.setVisible(False)
             self.param2.setVisible(False)
+            self.param3.setVisible(False)
+            self.param4_combo.setVisible(False)
         if self.mode_combo.currentText() == "Sweep":
             self.param1_label.setText("Start")
             self.param2_label.setText("Stop")
+            self.param3_label.setText("Tiempo")
+            self.param4_label.setText("Spacing")
             self.param1.setEnabled(True)
             self.param2.setEnabled(True)
+            self.param3.setEnabled(True)
+            self.param4_combo.setEnabled(True)
             self.param1.setVisible(True)
             self.param2.setVisible(True)
+            self.param3.setVisible(True)
+            self.param4_combo.setVisible(True)
         if self.mode_combo.currentText() == "Burst":
             self.param1_label.setText("Ciclos")
             self.param2_label.setText("Período [s]")
+            self.param3_label.setText("")
+            self.param4_label.setText("")
             self.param1.setEnabled(True)
+            self.param2.setEnabled(True)
+            self.param3.setEnabled(False)
+            self.param4_combo.setEnabled(False)
             self.param2.setEnabled(True)
             self.param1.setVisible(True)
             self.param2.setVisible(True)
+            self.param3.setVisible(False)
+            self.param4_combo.setVisible(False)
 
     def connect_device(self, device='USB0::0x0400::0x09C4::DG1D200200107::INSTR'):
         """Connect the device"""
