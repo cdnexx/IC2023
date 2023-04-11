@@ -129,22 +129,22 @@
     <property name="title">
      <string/>
     </property>
-    <widget class="QLineEdit" name="period_stop_input">
+    <widget class="QLineEdit" name="param2_input">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>150</x>
        <y>30</y>
-       <width>91</width>
+       <width>51</width>
        <height>20</height>
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="period_stop_label">
+    <widget class="QLabel" name="param2_label">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>150</x>
        <y>10</y>
-       <width>91</width>
+       <width>51</width>
        <height>16</height>
       </rect>
      </property>
@@ -152,12 +152,12 @@
       <string>Período</string>
      </property>
     </widget>
-    <widget class="QLabel" name="cycle_start_label">
+    <widget class="QLabel" name="param1_label">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>90</x>
        <y>10</y>
-       <width>91</width>
+       <width>51</width>
        <height>16</height>
       </rect>
      </property>
@@ -165,12 +165,12 @@
       <string>Ciclos</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="cycle_start_input">
+    <widget class="QLineEdit" name="param1_input">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>90</x>
        <y>30</y>
-       <width>91</width>
+       <width>51</width>
        <height>20</height>
       </rect>
      </property>
@@ -180,7 +180,7 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>91</width>
+       <width>71</width>
        <height>22</height>
       </rect>
      </property>
@@ -212,6 +212,62 @@
      <property name="text">
       <string>Modo</string>
      </property>
+    </widget>
+    <widget class="QLineEdit" name="param3_input">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>30</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="param3_label">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>10</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tiempo</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="param4_label">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>10</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Spacing</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="param4_combo">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>30</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Linear</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Log</string>
+      </property>
+     </item>
     </widget>
    </widget>
    <widget class="QGroupBox" name="save_group">
@@ -355,10 +411,23 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="query_button">
+   <widget class="QPushButton" name="run_button">
     <property name="geometry">
      <rect>
       <x>270</x>
+      <y>230</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Run</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="query_button_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
       <y>230</y>
       <width>91</width>
       <height>23</height>
@@ -408,7 +477,7 @@
   <connection>
    <sender>mode_combo</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>cycle_start_label</receiver>
+   <receiver>param1_label</receiver>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -424,7 +493,7 @@
   <connection>
    <sender>mode_combo</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>period_stop_label</receiver>
+   <receiver>param2_label</receiver>
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
