@@ -259,7 +259,11 @@ class Ui_MainWindow(object):
         return float(self.param3.text())
 
     def get_param4(self) -> str:
-        return self.param4_combo.currentText()
+        spacing = {
+            "Linear": "LIN",
+            "Log": "LOG"
+        }
+        return spacing[self.param4_combo.currentText()]
 
     # ------------------ Methods ------------------
 
@@ -305,20 +309,24 @@ class Ui_MainWindow(object):
         else:
             commands.append(f"{mode[self.get_mode()]}:STAT ON")
 
-        # # Config sweep and burst
-        # if self.get_mode() == "Sweep":
-        #     commands.append(" ")
-        # elif self.get_mode() == "Burst":
-        #     # Set cycle number. min=1 max=50000 || infinite=INF
-        #     commands.append(f"BURS:NCYC {self.get_param1()}")
-        #     # Set the period of burst. min=0.000001 max=500
-        #     commands.append(f"BURS:INT:PER {self.get_param2()}")
+        # Config sweep and burst
+        if self.get_mode() == "Sweep":
+            commands.append(f"FREQ:STAR {self.get_param1()}")
+            commands.append(f"FREQ:STOP {self.get_param2()}")
+            commands.append(f"SWE:TIME {self.get_param3()}")
+            commands.append(f"SWE:SPAC {self.get_param4()}")
+        elif self.get_mode() == "Burst":
+            # Set cycle number. min=1 max=50000 || infinite=INF
+            commands.append(f"BURS:NCYC {self.get_param1()}")
+            # Set the period of burst. min=0.000001 max=500
+            commands.append(f"BURS:INT:PER {self.get_param2()}")
         try:
-          for cmd in commands:
+            for cmd in commands:
                 self.send_command(cmd)
             self.message_return('Configuración enviada.', self.green_alert)
         except:
-            self.message_return("Error al enviar la configuración", self.red_alert)
+            self.message_return(
+                "Error al enviar la configuración", self.red_alert)
 
     def send_and_run(self):
         try:
