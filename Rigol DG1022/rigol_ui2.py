@@ -281,7 +281,7 @@ class Ui_MainWindow(object):
 
     def send_command(self, cmd):
         self.dg1022.write(cmd)
-        delay = 0.001 * len(cmd)
+        delay = 0.0005 * len(cmd)
         time.sleep(delay)
         if cmd[-1] == '?':
             return self.dg1022.read()
