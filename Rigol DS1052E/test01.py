@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Connect to the oscilloscope
 rm = pyvisa.ResourceManager()
-scope = rm.open_resource('USB0::0x1AB1::0x0588::DS1ED141904883')
+scope = rm.open_resource('USB0::0x1AB1::0x0588::DS1ET200601265::INSTR')
 
 # Set up the oscilloscope for data acquisition
 scope.write(':STOP')
