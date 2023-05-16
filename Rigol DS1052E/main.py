@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+import pyvisa
 
 
 class App(QtWidgets.QMainWindow):
@@ -23,19 +24,43 @@ class GraphCanvas(FigureCanvas):
         self.ax.grid()
         # self.ax.margin(x=0)
 
+        # Connect to oscilloscope
+        self.rm = pyvisa.ResourceManager()
+        self.osc = self.rm.open_resource('USB0::0x1AB1::0x0588::DS1ET200601265::INSTR',
+                                         timeout=20, chunk_size=1024000)
         self.plot_data()
 
     def plot_data(self):
-        def read_file(file, array):
-            with open(f'{file}', 'r') as datafile:
-                for line in datafile:
-                    array.append(float(line))
+        # Grab raw data from CH1
+        self.osc.write(":STOP")
 
-        data = []
-        time = []
+        # Get the timescale
+        timescale = float(self.osc.query(":TIM:SCAL?"))
 
-        read_file('data.txt', data)
-        read_file('time.txt', time)
+        # Get the timescale offset
+        timeoffset = float(self.osc.query(":TIM:OFFS?")[0])
+        voltscale = float(self.osc.query(':CHAN1:SCAL?')[0])
+
+        # Get the voltage offset
+        voltoffset = float(self.osc.query(":CHAN1:OFFS?")[0])
+
+        self.osc.write(":WAV:POIN:MODE RAW")
+        self.osc.write(":WAV:DATA? CHAN1")  # Request the data
+        raw_data = self.osc.read_raw()  # Read the data
+        raw_data = raw_data[10:]  # Remove header (first 10 characters)
+        data_size = len(raw_data)
+        # sample_rate = float(self.osc.query(':ACQ:SAMP?')[0]) # Get the sample rate
+
+        self.osc.write(":KEY:FORCE")
+        self.osc.write(":RUN")
+
+        data = np.frombuffer(raw_data, 'B')
+        data = data * -1 + 255
+        data = (data - 130.0 - voltoffset/voltscale*25) / 25 * voltscale
+
+        time = np.linspace(timeoffset - 6 * timescale,
+                           timeoffset + 6 * timescale,
+                           num=len(data))
 
         if (time[-1] < 1e-3):
             time = [t * 1e6 for t in time]
@@ -54,7 +79,12 @@ class GraphCanvas(FigureCanvas):
 
         self.draw()
 
-        QtCore.QTimer.singleShot(1000, self.plot_data)
+        # Clear axes for next plot
+        plt.cla()
+
+        # Update plot every 100 ms
+        update_time = 100
+        QtCore.QTimer.singleShot(update_time, self.plot_data)
 
 
 if __name__ == '__main__':
