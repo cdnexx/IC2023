@@ -499,6 +499,8 @@ class Ui_MainWindow(object):
             self.dg1022 = rm.open_resource(device)
             self.message_return(f"Conectado a: {device}", self.green_alert)
         except pyvisa.errors.VisaIOError:
+            rm = pyvisa.ResourceManager()
+            print(rm.list_resources())
             self.message_return(
                 "Error al conectar con el dispositivo.", self.red_alert)
         except ValueError:
