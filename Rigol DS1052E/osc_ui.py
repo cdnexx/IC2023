@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
         self.tab_time = QtWidgets.QWidget()
         self.tab_time.setObjectName("tab_time")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.tab_time)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 441, 261))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 431, 251))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.time_layout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.time_layout.setContentsMargins(0, 0, 0, 0)
@@ -33,7 +33,7 @@ class Ui_MainWindow(object):
         self.tab_frequency = QtWidgets.QWidget()
         self.tab_frequency.setObjectName("tab_frequency")
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.tab_frequency)
-        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 441, 261))
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 431, 251))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.freq_layout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.freq_layout.setContentsMargins(0, 0, 0, 0)
@@ -95,13 +95,3 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         pass
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
