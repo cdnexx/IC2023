@@ -35,8 +35,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>441</width>
-        <height>261</height>
+        <width>431</width>
+        <height>251</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="time_layout"/>
@@ -51,8 +51,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>441</width>
-        <height>261</height>
+        <width>431</width>
+        <height>251</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="freq_layout"/>
