@@ -16,7 +16,8 @@ class App(QtWidgets.QMainWindow):
         self.plot = GraphCanvas()
         self.ui.time_layout.addWidget(self.plot)
 
-        print(self.plot.osc.query(":CHAN1:SCAL?"))
+        self.initial_slider_value(channel=1)
+        self.initial_slider_value(channel=2)
 
         self.ui.ch1_slider.valueChanged.connect(
             lambda: self.change_scale(channel=1, value=self.ui.ch1_slider.value()))
