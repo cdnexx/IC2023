@@ -136,8 +136,8 @@ class GraphCanvas(FigureCanvas):
         ax.plot(time, data_ch1)
         ax.plot(time, data_ch2)
 
-        plt.ylabel('Voltaje (V)')
-        plt.xlabel("Tiempo (" + tUnit + ")")
+        # plt.ylabel('Voltaje (V)')
+        # plt.xlabel("Tiempo (" + tUnit + ")")
         plt.xlim(time[0], time[-1])
 
         self.draw()
