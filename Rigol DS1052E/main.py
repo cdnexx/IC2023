@@ -16,15 +16,14 @@ class App(QtWidgets.QMainWindow):
         self.plot = GraphCanvas()
         self.ui.time_layout.addWidget(self.plot)
 
-        self.initial_slider_value(channel=1)
-        self.initial_slider_value(channel=2)
+        self.initial_slider_value()
 
         self.ui.ch1_slider.valueChanged.connect(
             lambda: self.change_scale(channel=1, value=self.ui.ch1_slider.value()))
         self.ui.ch2_slider.valueChanged.connect(
             lambda: self.change_scale(channel=2, value=self.ui.ch2_slider.value()))
 
-    def initial_slider_value(self, channel: int):
+    def initial_slider_value(self):
         # Slider values according to scale values when probe is 1x
         slider_value = {
             10: 1,
@@ -40,8 +39,11 @@ class App(QtWidgets.QMainWindow):
             0.005: 11,
             0.002: 12
         }
-        current_value = float(self.plot.osc.query(f":CHAN{channel}:SCAL?"))
-        self.ui.ch1_slider.setValue(slider_value[current_value])
+        current_value_ch1 = float(self.plot.osc.query(f":CHAN1:SCAL?"))
+        current_value_ch2 = float(self.plot.osc.query(f":CHAN2:SCAL?"))
+
+        self.ui.ch1_slider.setValue(slider_value[current_value_ch1])
+        self.ui.ch2_slider.setValue(slider_value[current_value_ch2])
 
     def change_scale(self, channel: int, value: int):
         # Scale values according to slider values when probe is 1x
