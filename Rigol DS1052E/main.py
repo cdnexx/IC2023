@@ -16,6 +16,30 @@ class App(QtWidgets.QMainWindow):
         self.plot = GraphCanvas()
         self.ui.time_layout.addWidget(self.plot)
 
+        self.ui.ch1_slider.valueChanged.connect(
+            lambda: self.change_scale(channel=1, value=self.ui.ch1_slider.value()))
+        self.ui.ch2_slider.valueChanged.connect(
+            lambda: self.change_scale(channel=2, value=self.ui.ch2_slider.value()))
+
+    def change_scale(self, channel, value):
+        # Scale values according to slider values when probe is 1x
+        scale_value = {
+            1: 10,
+            2: 5,
+            3: 2,
+            4: 1,
+            5: 0.5,
+            6: 0.2,
+            7: 0.1,
+            8: 0.05,
+            9: 0.02,
+            10: 0.01,
+            11: 0.005,
+            12: 0.002
+        }
+
+        self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
+
 
 class GraphCanvas(FigureCanvas):
     def __init__(self, parent=None):
