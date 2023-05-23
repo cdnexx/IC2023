@@ -16,53 +16,86 @@ class App(QtWidgets.QMainWindow):
         self.plot = GraphCanvas()
         self.ui.time_layout.addWidget(self.plot)
 
-        self.initial_slider_value()
+        self.initial_channel_slider_value()
 
         self.ui.ch1_slider.valueChanged.connect(
-            lambda: self.change_scale(channel=1, value=self.ui.ch1_slider.value()))
+            lambda: self.change_channel_scale(channel=1, value=self.ui.ch1_slider.value()))
         self.ui.ch2_slider.valueChanged.connect(
-            lambda: self.change_scale(channel=2, value=self.ui.ch2_slider.value()))
+            lambda: self.change_channel_scale(channel=2, value=self.ui.ch2_slider.value()))
+        self.ui.time_slider.valueChanged.connect(
+            lambda: self.change_time_scale(value=self.ui.time_slider.value()))
 
-    def initial_slider_value(self):
+    def initial_channel_slider_value(self):
         # Slider values according to scale values when probe is 1x
-        slider_value = {
-            10: 1,
-            5: 2,
-            2: 3,
-            1: 4,
-            0.5: 5,
-            0.2: 6,
-            0.1: 7,
-            0.05: 8,
-            0.02: 9,
-            0.01: 10,
-            0.005: 11,
-            0.002: 12
-        }
-        current_value_ch1 = float(self.plot.osc.query(f":CHAN1:SCAL?"))
-        current_value_ch2 = float(self.plot.osc.query(f":CHAN2:SCAL?"))
+        channel_slider_value = self.change_channel_scale(get_scale=True)
+        time_slider_value = self.change_time_scale(get_scale=True)
 
-        self.ui.ch1_slider.setValue(slider_value[current_value_ch1])
-        self.ui.ch2_slider.setValue(slider_value[current_value_ch2])
+        current_value_ch1 = float(self.plot.osc.query(":CHAN1:SCAL?"))
+        current_value_ch2 = float(self.plot.osc.query(":CHAN2:SCAL?"))
+        current_value_time = float(self.plot.osc.query(":TIM:SCAL?"))
 
-    def change_scale(self, channel: int, value: int):
+        self.ui.ch1_slider.setValue(channel_slider_value[current_value_ch1])
+        self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
+        self.ui.time_slider.setValue(time_slider_value[current_value_time])
+
+    def change_channel_scale(self, channel=None, value=None, get_scale=False):
         # Scale values according to slider values when probe is 1x
         scale_value = {
-            1: 10,
-            2: 5,
-            3: 2,
-            4: 1,
-            5: 0.5,
-            6: 0.2,
-            7: 0.1,
-            8: 0.05,
-            9: 0.02,
-            10: 0.01,
-            11: 0.005,
-            12: 0.002
+            1: 1e+01,
+            2: 5e+00,
+            3: 2e+00,
+            4: 1e+00,
+            5: 5e-01,
+            6: 2e-01,
+            7: 1e-01,
+            8: 5e-02,
+            9: 2e-02,
+            10: 1e-02,
+            11: 5e-03,
+            12: 2e-03
         }
+        if get_scale:
+            return scale_value
 
         self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
+
+    def change_time_scale(self, value=None, get_scale=False):
+        scale_value = {
+            1: 5e+01,
+            2: 2e+01,
+            3: 1e+01,
+            4: 5e+00,
+            5: 2e+00,
+            6: 1e+00,
+            7: 5e-01,
+            8: 2e-01,
+            9: 1e-01,
+            10: 5e-02,
+            11: 2e-02,
+            12: 1e-02,
+            13: 5e-03,
+            14: 2e-03,
+            15: 1e-03,
+            16: 5e-04,
+            17: 2e-04,
+            18: 1e-04,
+            19: 5e-05,
+            20: 2e-05,
+            21: 1e-05,
+            22: 5e-06,
+            23: 2e-06,
+            24: 1e-06,
+            25: 5e-07,
+            26: 2e-07,
+            27: 1e-07,
+            28: 5e-08,
+            29: 2e-08,
+            30: 1e-08,
+            31: 5e-19
+        }
+        if get_scale:
+            return scale_value
+        self.plot.osc.write(f":TIM:SCAL {scale_value[value]}")
 
 
 class GraphCanvas(FigureCanvas):

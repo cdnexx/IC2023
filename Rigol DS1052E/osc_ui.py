@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'osc.ui'
+# Form implementation generated from reading ui file 'qtdesigner/osc.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -91,6 +91,9 @@ class Ui_MainWindow(object):
         self.time_group.setObjectName("time_group")
         self.time_slider = QtWidgets.QSlider(self.time_group)
         self.time_slider.setGeometry(QtCore.QRect(10, 20, 421, 22))
+        self.time_slider.setMinimum(1)
+        self.time_slider.setMaximum(31)
+        self.time_slider.setPageStep(1)
         self.time_slider.setOrientation(QtCore.Qt.Horizontal)
         self.time_slider.setObjectName("time_slider")
         MainWindow.setCentralWidget(self.centralwidget)
