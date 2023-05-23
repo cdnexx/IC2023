@@ -28,7 +28,9 @@ class App(QtWidgets.QMainWindow):
     def initial_channel_slider_value(self):
         # Slider values according to scale values when probe is 1x
         channel_slider_value = self.change_channel_scale(get_scale=True)
+        channel_slider_value = {v: k for k, v in channel_slider_value.items()}
         time_slider_value = self.change_time_scale(get_scale=True)
+        time_slider_value = {v: k for k, v in time_slider_value.items()}
 
         current_value_ch1 = float(self.plot.osc.query(":CHAN1:SCAL?"))
         current_value_ch2 = float(self.plot.osc.query(":CHAN2:SCAL?"))
