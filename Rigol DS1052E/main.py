@@ -27,10 +27,54 @@ class App(QtWidgets.QMainWindow):
 
     def initial_channel_slider_value(self):
         # Slider values according to scale values when probe is 1x
-        channel_slider_value = self.change_channel_scale(get_scale=True)
-        channel_slider_value = {v: k for k, v in channel_slider_value.items()}
-        time_slider_value = self.change_time_scale(get_scale=True)
-        time_slider_value = {v: k for k, v in time_slider_value.items()}
+        channel_slider_value = {
+            1e+01: 1,
+            5e+00: 2,
+            2e+00: 3,
+            1e+00: 4,
+            5e-01: 5,
+            2e-01: 6,
+            1e-01: 7,
+            5e-02: 8,
+            2e-02: 9,
+            1e-02: 10,
+            5e-03: 11,
+            2e-03: 12
+        }
+
+        time_slider_value = {
+            5e+01: 1,
+            2e+01: 2,
+            1e+01: 3,
+            5e+00: 4,
+            2e+00: 5,
+            1e+00: 6,
+            5e-01: 7,
+            2e-01: 8,
+            1e-01: 9,
+            5e-02: 10,
+            2e-02: 11,
+            1e-02: 12,
+            5e-03: 13,
+            2e-03: 14,
+            1e-03: 15,
+            5e-04: 16,
+            2e-04: 17,
+            1e-04: 18,
+            5e-05: 19,
+            2e-05: 20,
+            1e-05: 21,
+            5e-06: 22,
+            2e-06: 23,
+            1e-06: 24,
+            5e-07: 25,
+            2e-07: 26,
+            1e-07: 27,
+            5e-08: 28,
+            2e-08: 29,
+            1e-08: 30,
+            5e-09: 31
+        }
 
         current_value_ch1 = float(self.plot.osc.query(":CHAN1:SCAL?"))
         current_value_ch2 = float(self.plot.osc.query(":CHAN2:SCAL?"))
@@ -40,7 +84,7 @@ class App(QtWidgets.QMainWindow):
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
 
-    def change_channel_scale(self, channel=None, value=None, get_scale=False):
+    def change_channel_scale(self, channel: int, value: int):
         # Scale values according to slider values when probe is 1x
         scale_value = {
             1: 1e+01,
@@ -56,12 +100,10 @@ class App(QtWidgets.QMainWindow):
             11: 5e-03,
             12: 2e-03
         }
-        if get_scale:
-            return scale_value
 
         self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
 
-    def change_time_scale(self, value=None, get_scale=False):
+    def change_time_scale(self, value: int):
         scale_value = {
             1: 5e+01,
             2: 2e+01,
@@ -93,18 +135,18 @@ class App(QtWidgets.QMainWindow):
             28: 5e-08,
             29: 2e-08,
             30: 1e-08,
-            31: 5e-19
+            31: 5e-09
         }
-        if get_scale:
-            return scale_value
+
         self.plot.osc.write(f":TIM:SCAL {scale_value[value]}")
 
 
 class GraphCanvas(FigureCanvas):
     def __init__(self, parent=None):
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax1 = plt.subplots()
+        self.ax2 = self.ax1.twinx()
         super().__init__(self.fig)
-        self.ax.grid()
+
         # self.ax.margin(x=0)
 
         # Connect to oscilloscope
@@ -115,10 +157,10 @@ class GraphCanvas(FigureCanvas):
 
     def get_channel_data(self, channel: int):
         # Get volt scale
-        voltscale = float(self.osc.query(f':CHAN{channel}:SCAL?')[0])
+        voltscale = float(self.osc.query(f':CHAN{channel}:SCAL?'))  # [0]
 
         # Get the voltage offset
-        voltoffset = float(self.osc.query(f":CHAN{channel}:OFFS?")[0])
+        voltoffset = float(self.osc.query(f":CHAN{channel}:OFFS?"))  # [0]
 
         self.osc.write(f":WAV:DATA? CHAN{channel}")  # Request the data
         raw_data = self.osc.read_raw()  # Read the data
@@ -167,9 +209,11 @@ class GraphCanvas(FigureCanvas):
             tUnit = "S"
 
         # Plot each channel
-        ax = plt.subplot()
-        ax.plot(time, data_ch1)
-        ax.plot(time, data_ch2)
+        # ax = plt.subplot()
+        self.ax1.plot(time, data_ch1)
+        self.ax2.plot(time, data_ch2, 'r-')
+        self.ax1.grid(True)
+        self.ax2.grid(True)
 
         # plt.ylabel('Voltaje (V)')
         # plt.xlabel("Tiempo (" + tUnit + ")")
@@ -178,7 +222,9 @@ class GraphCanvas(FigureCanvas):
         self.draw()
 
         # Clear axes for next plot
-        plt.cla()
+        self.ax1.cla()
+        self.ax2.cla()
+        # plt.cla()
 
         # Update plot every 100 ms
         update_time = 100
