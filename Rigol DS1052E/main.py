@@ -148,93 +148,40 @@ class App(QtWidgets.QMainWindow):
         if slider == "ch1":
             scale = float(self.plot.osc.query(":CHAN1:SCAL?"))
             self.ui.ch1_scale_label.setText(
-                f"{self.get_prefix(float(scale))}V")
+                f"{self.transform_decimal(float(scale))}V")
         elif slider == "ch2":
             scale = float(self.plot.osc.query(":CHAN2:SCAL?"))
             self.ui.ch2_scale_label.setText(
-                f"{self.get_prefix(float(scale))}V")
+                f"{self.transform_decimal(float(scale))}V")
             print(scale)
         elif slider == "time":
             scale = float(self.plot.osc.query(":TIM:SCAL?"))
             self.ui.time_scale_label.setText(
-                f"{self.get_prefix(float(scale))}S")
+                f"{self.transform_decimal(float(scale))}S")
             print(scale)
         elif slider == "all":
             self.update_scale_label("ch1")
             self.update_scale_label("ch2")
             self.update_scale_label("time")
 
-    def get_prefix(self, value):
-        # pre_number = str(value).split("e")[0]
-        number = {
-            5e+01: "5",
-            2e+01: "2",
-            1e+01: "1",
-            5e+00: "5",
-            2e+00: "2",
-            1e+00: "1",
-            5e-01: "5",
-            2e-01: "2",
-            1e-01: "1",
-            5e-02: "5",
-            2e-02: "2",
-            1e-02: "1",
-            5e-03: "5",
-            2e-03: "2",
-            1e-03: "1",
-            5e-04: "5",
-            2e-04: "2",
-            1e-04: "1",
-            5e-05: "5",
-            2e-05: "2",
-            1e-05: "1",
-            5e-06: "5",
-            2e-06: "2",
-            1e-06: "1",
-            5e-07: "5",
-            2e-07: "2",
-            1e-07: "1",
-            5e-08: "5",
-            2e-08: "2",
-            1e-08: "1",
-            5e-09: "5",
+    def transform_decimal(self, number):
+        prefixes = {
+            -3: 'm',
+            -6: 'µ',
+            -9: 'n'
         }
 
-        prefix = {
-            5e+01: "0 ",
-            2e+01: "0 ",
-            1e+01: "0 ",
-            5e+00: " ",
-            2e+00: " ",
-            1e+00: " ",
-            5e-01: "00 m",
-            2e-01: "00 m",
-            1e-01: "00 m",
-            5e-02: "0 m",
-            2e-02: "0 m",
-            1e-02: "0 m",
-            5e-03: " m",
-            2e-03: " m",
-            1e-03: " m",
-            5e-04: "00 u",
-            2e-04: "00 u",
-            1e-04: "00 u",
-            5e-05: "0 u",
-            2e-05: "0 u",
-            1e-05: "0 u",
-            5e-06: " u",
-            2e-06: " u",
-            1e-06: " u",
-            5e-07: "00 n",
-            2e-07: "00 n",
-            1e-07: "00 n",
-            5e-08: "0 n",
-            2e-08: "0 n",
-            1e-08: "0 n",
-            5e-09: " n",
-        }
+        exponent = 0
+        while number < 1 and exponent > -9:
+            number *= 1000
+            exponent -= 3
 
-        return f"{number[value]}{prefix[value]}"
+        integer_value = int(number)
+
+        if exponent in prefixes:
+            return f'{integer_value} {prefixes[exponent]}'
+        else:
+            return integer_value
 
 
 class GraphCanvas(FigureCanvas):
