@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import pyvisa
+import time
 
 
 class App(QtWidgets.QMainWindow):
@@ -104,6 +105,7 @@ class App(QtWidgets.QMainWindow):
         }
 
         self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
+        time.sleep(0.05)
         self.update_scale_label(f"ch{channel}")
 
     def change_time_scale(self, value: int):
@@ -179,9 +181,9 @@ class App(QtWidgets.QMainWindow):
         integer_value = int(number)
 
         if exponent in prefixes:
-            return f'{integer_value} {prefixes[exponent]}'
+            return f"{integer_value} {prefixes[exponent]}"
         else:
-            return integer_value
+            return f"{integer_value} "
 
 
 class GraphCanvas(FigureCanvas):
