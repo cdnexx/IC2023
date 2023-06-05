@@ -146,16 +146,16 @@ class App(QtWidgets.QMainWindow):
 
     def update_scale_label(self, slider: str):
         if slider == "ch1":
-            scale = self.plot.osc.query(":CHAN1:SCAL?")
+            scale = float(self.plot.osc.query(":CHAN1:SCAL?"))
             self.ui.ch1_scale_label.setText(
                 f"{self.get_prefix(float(scale))}V")
         elif slider == "ch2":
-            scale = self.plot.osc.query(":CHAN2:SCAL?")
+            scale = float(self.plot.osc.query(":CHAN2:SCAL?"))
             self.ui.ch2_scale_label.setText(
                 f"{self.get_prefix(float(scale))}V")
             print(scale)
         elif slider == "time":
-            scale = self.plot.osc.query(":TIM:SCAL?")
+            scale = float(self.plot.osc.query(":TIM:SCAL?"))
             self.ui.time_scale_label.setText(
                 f"{self.get_prefix(float(scale))}S")
             print(scale)
@@ -165,14 +165,40 @@ class App(QtWidgets.QMainWindow):
             self.update_scale_label("time")
 
     def get_prefix(self, value):
-        pre_number = str(value).split("e")[0]
-        number = "Error"
-        if "1" in pre_number:
-            number = "1"
-        elif "2" in pre_number:
-            number = "2"
-        elif "5" in pre_number:
-            number = "5"
+        # pre_number = str(value).split("e")[0]
+        number = {
+            5e+01: "5",
+            2e+01: "2",
+            1e+01: "1",
+            5e+00: "5",
+            2e+00: "2",
+            1e+00: "1",
+            5e-01: "5",
+            2e-01: "2",
+            1e-01: "1",
+            5e-02: "5",
+            2e-02: "2",
+            1e-02: "1",
+            5e-03: "5",
+            2e-03: "2",
+            1e-03: "1",
+            5e-04: "5",
+            2e-04: "2",
+            1e-04: "1",
+            5e-05: "5",
+            2e-05: "2",
+            1e-05: "1",
+            5e-06: "5",
+            2e-06: "2",
+            1e-06: "1",
+            5e-07: "5",
+            2e-07: "2",
+            1e-07: "1",
+            5e-08: "5",
+            2e-08: "2",
+            1e-08: "1",
+            5e-09: "5",
+        }
 
         prefix = {
             5e+01: "0 ",
@@ -208,7 +234,7 @@ class App(QtWidgets.QMainWindow):
             5e-09: " n",
         }
 
-        return f"{number}{prefix[value]}"
+        return f"{number[value]}{prefix[value]}"
 
 
 class GraphCanvas(FigureCanvas):
