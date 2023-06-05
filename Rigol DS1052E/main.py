@@ -85,7 +85,10 @@ class App(QtWidgets.QMainWindow):
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
 
-        self.update_scale_label("all")
+        self.update_scale_label("all", 
+                                ch1_value=current_value_ch1,
+                                ch2_value=current_value_ch2, 
+                                t_value=current_value_time)
 
     def change_channel_scale(self, channel: int, value: int):
         # Scale values according to slider values when probe is 1x
@@ -105,8 +108,12 @@ class App(QtWidgets.QMainWindow):
         }
 
         self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
-        time.sleep(0.05)
-        self.update_scale_label(f"ch{channel}")
+        if channel == 1:
+            self.update_scale_label(
+                f"ch{channel}", ch1_value=scale_value[value])
+        elif channel == 2:
+            self.update_scale_label(
+                f"ch{channel}", ch2_value=scale_value[value])
 
     def change_time_scale(self, value: int):
         scale_value = {
@@ -144,27 +151,25 @@ class App(QtWidgets.QMainWindow):
         }
 
         self.plot.osc.write(f":TIM:SCAL {scale_value[value]}")
-        self.update_scale_label("time")
+        self.update_scale_label("time", t_value=scale_value[value])
 
-    def update_scale_label(self, slider: str):
+    def update_scale_label(self, slider: str, **values):
         if slider == "ch1":
-            scale = float(self.plot.osc.query(":CHAN1:SCAL?"))
+            scale = values["ch1_value"]
             self.ui.ch1_scale_label.setText(
                 f"{self.transform_decimal(float(scale))}V")
         elif slider == "ch2":
-            scale = float(self.plot.osc.query(":CHAN2:SCAL?"))
+            scale = values["ch2_value"]
             self.ui.ch2_scale_label.setText(
                 f"{self.transform_decimal(float(scale))}V")
-            print(scale)
         elif slider == "time":
-            scale = float(self.plot.osc.query(":TIM:SCAL?"))
+            scale = values["t_value"]
             self.ui.time_scale_label.setText(
                 f"{self.transform_decimal(float(scale))}S")
-            print(scale)
         elif slider == "all":
-            self.update_scale_label("ch1")
-            self.update_scale_label("ch2")
-            self.update_scale_label("time")
+            self.update_scale_label("ch1", ch1_value=values["ch1_value"])
+            self.update_scale_label("ch2", ch2_value=values["ch2_value"])
+            self.update_scale_label("time", t_value=values["t_value"])
 
     def transform_decimal(self, number):
         prefixes = {
