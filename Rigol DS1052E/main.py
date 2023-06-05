@@ -147,20 +147,68 @@ class App(QtWidgets.QMainWindow):
     def update_scale_label(self, slider: str):
         if slider == "ch1":
             scale = self.plot.osc.query(":CHAN1:SCAL?")
-            self.ui.ch1_scale_label.setText("asd")
-            print(scale)
+            self.ui.ch1_scale_label.setText(
+                f"{self.get_prefix(float(scale))}V")
         elif slider == "ch2":
             scale = self.plot.osc.query(":CHAN2:SCAL?")
-            self.ui.ch2_scale_label.setText("asd")
+            self.ui.ch2_scale_label.setText(
+                f"{self.get_prefix(float(scale))}V")
             print(scale)
         elif slider == "time":
             scale = self.plot.osc.query(":TIM:SCAL?")
-            self.ui.time_scale_label.setText("asd")
+            self.ui.time_scale_label.setText(
+                f"{self.get_prefix(float(scale))}S")
             print(scale)
         elif slider == "all":
             self.update_scale_label("ch1")
             self.update_scale_label("ch2")
             self.update_scale_label("time")
+
+    def get_prefix(self, value):
+        pre_number = str(value).split("e")[0]
+        number = "Error"
+        if "1" in pre_number:
+            number = "1"
+        elif "2" in pre_number:
+            number = "2"
+        elif "5" in pre_number:
+            number = "5"
+
+        prefix = {
+            5e+01: "0 ",
+            2e+01: "0 ",
+            1e+01: "0 ",
+            5e+00: " ",
+            2e+00: " ",
+            1e+00: " ",
+            5e-01: "00 m",
+            2e-01: "00 m",
+            1e-01: "00 m",
+            5e-02: "0 m",
+            2e-02: "0 m",
+            1e-02: "0 m",
+            5e-03: " m",
+            2e-03: " m",
+            1e-03: " m",
+            5e-04: "00 u",
+            2e-04: "00 u",
+            1e-04: "00 u",
+            5e-05: "0 u",
+            2e-05: "0 u",
+            1e-05: "0 u",
+            5e-06: " u",
+            2e-06: " u",
+            1e-06: " u",
+            5e-07: "00 n",
+            2e-07: "00 n",
+            1e-07: "00 n",
+            5e-08: "0 n",
+            2e-08: "0 n",
+            1e-08: "0 n",
+            5e-09: " n",
+        }
+
+        return f"{number}{prefix[value]}"
 
 
 class GraphCanvas(FigureCanvas):
