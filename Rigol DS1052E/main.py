@@ -84,6 +84,8 @@ class App(QtWidgets.QMainWindow):
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
 
+        self.update_scale_label("all")
+
     def change_channel_scale(self, channel: int, value: int):
         # Scale values according to slider values when probe is 1x
         scale_value = {
@@ -102,6 +104,7 @@ class App(QtWidgets.QMainWindow):
         }
 
         self.plot.osc.write(f":CHAN{channel}:SCAL {scale_value[value]}")
+        self.update_scale_label(f"ch{channel}")
 
     def change_time_scale(self, value: int):
         scale_value = {
@@ -139,6 +142,25 @@ class App(QtWidgets.QMainWindow):
         }
 
         self.plot.osc.write(f":TIM:SCAL {scale_value[value]}")
+        self.update_scale_label("time")
+
+    def update_scale_label(self, slider: str):
+        if slider == "ch1":
+            scale = self.plot.osc.query(":CHAN1:SCAL?")
+            self.ui.ch1_scale_label.setText("asd")
+            print(scale)
+        elif slider == "ch2":
+            scale = self.plot.osc.query(":CHAN2:SCAL?")
+            self.ui.ch2_scale_label.setText("asd")
+            print(scale)
+        elif slider == "time":
+            scale = self.plot.osc.query(":TIM:SCAL?")
+            self.ui.time_scale_label.setText("asd")
+            print(scale)
+        elif slider == "all":
+            self.update_scale_label("ch1")
+            self.update_scale_label("ch2")
+            self.update_scale_label("time")
 
 
 class GraphCanvas(FigureCanvas):

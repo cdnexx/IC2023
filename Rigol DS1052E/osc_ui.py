@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Rigol DS1052E/qtdesigner/osc.ui'
+# Form implementation generated from reading ui file 'osc.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -85,14 +85,14 @@ class Ui_MainWindow(object):
         self.trigger_label.setGeometry(QtCore.QRect(100, 20, 41, 16))
         self.trigger_label.setText("Trigger")
         self.trigger_label.setObjectName("trigger_label")
-        self.ch1_state = QtWidgets.QLabel(self.settings_group)
-        self.ch1_state.setGeometry(QtCore.QRect(10, 210, 41, 16))
-        self.ch1_state.setText("200 mV")
-        self.ch1_state.setObjectName("ch1_state")
-        self.ch2_state = QtWidgets.QLabel(self.settings_group)
-        self.ch2_state.setGeometry(QtCore.QRect(60, 210, 41, 16))
-        self.ch2_state.setText("500 mV")
-        self.ch2_state.setObjectName("ch2_state")
+        self.ch1_scale_label = QtWidgets.QLabel(self.settings_group)
+        self.ch1_scale_label.setGeometry(QtCore.QRect(10, 210, 41, 16))
+        self.ch1_scale_label.setText("200 mV")
+        self.ch1_scale_label.setObjectName("ch1_scale_label")
+        self.ch2_scale_label = QtWidgets.QLabel(self.settings_group)
+        self.ch2_scale_label.setGeometry(QtCore.QRect(60, 210, 41, 16))
+        self.ch2_scale_label.setText("500 mV")
+        self.ch2_scale_label.setObjectName("ch2_scale_label")
         self.time_group = QtWidgets.QGroupBox(self.centralwidget)
         self.time_group.setGeometry(QtCore.QRect(20, 300, 441, 51))
         self.time_group.setTitle("Tiempo")
@@ -104,10 +104,10 @@ class Ui_MainWindow(object):
         self.time_slider.setPageStep(1)
         self.time_slider.setOrientation(QtCore.Qt.Horizontal)
         self.time_slider.setObjectName("time_slider")
-        self.time_state = QtWidgets.QLabel(self.time_group)
-        self.time_state.setGeometry(QtCore.QRect(400, 20, 41, 16))
-        self.time_state.setText("500 us")
-        self.time_state.setObjectName("time_state")
+        self.time_scale_label = QtWidgets.QLabel(self.time_group)
+        self.time_scale_label.setGeometry(QtCore.QRect(400, 20, 41, 16))
+        self.time_scale_label.setText("500 us")
+        self.time_scale_label.setObjectName("time_scale_label")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)

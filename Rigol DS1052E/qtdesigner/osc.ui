@@ -206,7 +206,7 @@
       <string notr="true">Trigger</string>
      </property>
     </widget>
-    <widget class="QLabel" name="ch1_state">
+    <widget class="QLabel" name="ch1_scale_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -219,7 +219,7 @@
       <string notr="true">200 mV</string>
      </property>
     </widget>
-    <widget class="QLabel" name="ch2_state">
+    <widget class="QLabel" name="ch2_scale_label">
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -267,7 +267,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="time_state">
+    <widget class="QLabel" name="time_scale_label">
      <property name="geometry">
       <rect>
        <x>400</x>
