@@ -81,13 +81,18 @@ class App(QtWidgets.QMainWindow):
         current_value_ch2 = float(self.plot.osc.query(":CHAN2:SCAL?"))
         current_value_time = float(self.plot.osc.query(":TIM:SCAL?"))
 
+        # Set initial slider value (position)
         self.ui.ch1_slider.setValue(channel_slider_value[current_value_ch1])
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
 
-        self.update_scale_label("all", 
+        # Set initial ylim
+        self.plot.set_ax1_ylim((-current_value_ch1, current_value_ch1))
+        self.plot.set_ax2_ylim((-current_value_ch2, current_value_ch2))
+
+        self.update_scale_label("all",
                                 ch1_value=current_value_ch1,
-                                ch2_value=current_value_ch2, 
+                                ch2_value=current_value_ch2,
                                 t_value=current_value_time)
 
     def change_channel_scale(self, channel: int, value: int):
@@ -111,9 +116,15 @@ class App(QtWidgets.QMainWindow):
         if channel == 1:
             self.update_scale_label(
                 f"ch{channel}", ch1_value=scale_value[value])
+            # Update ylim
+            ylim = (-scale_value[value], scale_value[value])
+            self.plot.set_ax1_ylim(ylim)
         elif channel == 2:
             self.update_scale_label(
                 f"ch{channel}", ch2_value=scale_value[value])
+            # Update ylim
+            ylim = (-scale_value[value], scale_value[value])
+            self.plot.set_ax2_ylim(ylim)
 
     def change_time_scale(self, value: int):
         scale_value = {
@@ -197,13 +208,20 @@ class GraphCanvas(FigureCanvas):
         self.ax2 = self.ax1.twinx()
         super().__init__(self.fig)
 
-        # self.ax.margin(x=0)
+        self.ax1_ylim = (-1, 1)
+        self.ax2_ylim = (-1, 1)
 
         # Connect to oscilloscope
         self.rm = pyvisa.ResourceManager()
         self.osc = self.rm.open_resource('USB0::0x1AB1::0x0588::DS1ET200601265::INSTR',
                                          timeout=20, chunk_size=1024000)
         self.plot_data()
+
+    def set_ax1_ylim(self, ylim):
+        self.ax1_ylim = ylim
+
+    def set_ax2_ylim(self, ylim):
+        self.ax2_ylim = ylim
 
     def get_channel_data(self, channel: int):
         # Get volt scale
@@ -262,8 +280,11 @@ class GraphCanvas(FigureCanvas):
         # ax = plt.subplot()
         self.ax1.plot(time, data_ch1)
         self.ax2.plot(time, data_ch2, 'r-')
+
         self.ax1.grid(True)
         self.ax2.grid(True)
+
+        self.ax1.set_ylim(self.ax1_ylim[0], self.ax2_ylim[1])
 
         # plt.ylabel('Voltaje (V)')
         # plt.xlabel("Tiempo (" + tUnit + ")")
