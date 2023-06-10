@@ -81,9 +81,14 @@ class App(QtWidgets.QMainWindow):
         current_value_ch2 = float(self.plot.osc.query(":CHAN2:SCAL?"))
         current_value_time = float(self.plot.osc.query(":TIM:SCAL?"))
 
+        # Set initial slider value (position)
         self.ui.ch1_slider.setValue(channel_slider_value[current_value_ch1])
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
+
+        # Set initial ylim
+        self.plot.set_ax1_ylim((-current_value_ch1*4, current_value_ch1*4))
+        self.plot.set_ax2_ylim((-current_value_ch2*4, current_value_ch2*4))
 
         self.update_scale_label("all",
                                 ch1_value=current_value_ch1,
@@ -111,9 +116,15 @@ class App(QtWidgets.QMainWindow):
         if channel == 1:
             self.update_scale_label(
                 f"ch{channel}", ch1_value=scale_value[value])
+            # Update ylim
+            ylim = (-scale_value[value]*4, scale_value[value]*4)
+            self.plot.set_ax1_ylim(ylim)
         elif channel == 2:
             self.update_scale_label(
                 f"ch{channel}", ch2_value=scale_value[value])
+            # Update ylim
+            ylim = (-scale_value[value]*4, scale_value[value]*4)
+            self.plot.set_ax2_ylim(ylim)
 
     def change_time_scale(self, value: int):
         scale_value = {
@@ -187,8 +198,8 @@ class App(QtWidgets.QMainWindow):
 
         if exponent in prefixes:
             return f"{integer_value} {prefixes[exponent]}"
-        else:
-            return f"{integer_value} "
+
+        return f"{integer_value} "
 
 
 class GraphCanvas(FigureCanvas):
@@ -199,15 +210,22 @@ class GraphCanvas(FigureCanvas):
         # Plot to display the grid
         self.grid_plot = self.ax1.twinx()
 
-        super().__init__(self.fig)
+        self.ax1_ylim = (-1, 1)
+        self.ax2_ylim = (-1, 1)
 
-        # self.ax.margin(x=0)
+        super().__init__(self.fig)
 
         # Connect to oscilloscope
         self.rm = pyvisa.ResourceManager()
         self.osc = self.rm.open_resource('USB0::0x1AB1::0x0588::DS1ET200601265::INSTR',
                                          timeout=20, chunk_size=1024000)
         self.plot_data()
+
+    def set_ax1_ylim(self, ylim):
+        self.ax1_ylim = ylim
+
+    def set_ax2_ylim(self, ylim):
+        self.ax2_ylim = ylim
 
     def get_channel_data(self, channel: int):
         # Get volt scale
@@ -227,10 +245,6 @@ class GraphCanvas(FigureCanvas):
         return data
 
     def plot_data(self):
-
-        # Grab raw data from CH1
-        # self.osc.write(":STOP")
-
         # Get the timescale
         timescale = float(self.osc.query(":TIM:SCAL?"))
 
@@ -238,12 +252,7 @@ class GraphCanvas(FigureCanvas):
         timeoffset = float(self.osc.query(":TIM:OFFS?")[0])
 
         self.osc.write(":WAV:POIN:MODE RAW")
-
-        # data_size = len(raw_data)
-        # sample_rate = float(self.osc.query(':ACQ:SAMP?')[0]) # Get the sample rate
-
         self.osc.write(":KEY:FORCE")
-        # self.osc.write(":RUN")
 
         # Get data from each channel
         data_ch1 = self.get_channel_data(channel=1)
@@ -259,7 +268,6 @@ class GraphCanvas(FigureCanvas):
             time = [t * 1e3 for t in time]
 
         # Plot each channel
-        # ax = plt.subplot()
         self.ax1.plot(time, data_ch1)
         self.ax2.plot(time, data_ch2, 'r-')
 
@@ -269,8 +277,9 @@ class GraphCanvas(FigureCanvas):
             self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
                                    linewidth=0.5, linestyle=(0, (5, 10)))
 
-        # plt.ylabel('Voltaje (V)')
-        # plt.xlabel("Tiempo (" + tUnit + ")")
+        self.ax1.set_ylim(self.ax1_ylim[0], self.ax2_ylim[1])
+        self.ax2.set_ylim(self.ax2_ylim[0], self.ax2_ylim[1])
+
         plt.xlim(time[0], time[-1])
 
         self.draw()
@@ -278,7 +287,6 @@ class GraphCanvas(FigureCanvas):
         # Clear axes for next plot
         self.ax1.cla()
         self.ax2.cla()
-        # plt.cla()
 
         # Update plot every 100 ms
         update_time = 100
