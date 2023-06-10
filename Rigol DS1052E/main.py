@@ -85,9 +85,9 @@ class App(QtWidgets.QMainWindow):
         self.ui.ch2_slider.setValue(channel_slider_value[current_value_ch2])
         self.ui.time_slider.setValue(time_slider_value[current_value_time])
 
-        self.update_scale_label("all", 
+        self.update_scale_label("all",
                                 ch1_value=current_value_ch1,
-                                ch2_value=current_value_ch2, 
+                                ch2_value=current_value_ch2,
                                 t_value=current_value_time)
 
     def change_channel_scale(self, channel: int, value: int):
@@ -195,6 +195,10 @@ class GraphCanvas(FigureCanvas):
     def __init__(self, parent=None):
         self.fig, self.ax1 = plt.subplots()
         self.ax2 = self.ax1.twinx()
+
+        # Plot to display the grid
+        self.grid_plot = self.ax1.twinx()
+
         super().__init__(self.fig)
 
         # self.ax.margin(x=0)
@@ -251,19 +255,19 @@ class GraphCanvas(FigureCanvas):
 
         if (time[-1] < 1e-3):
             time = [t * 1e6 for t in time]
-            tUnit = "uS"
         elif (time[-1] < 1):
             time = [t * 1e3 for t in time]
-            tUnit = "mS"
-        else:
-            tUnit = "S"
 
         # Plot each channel
         # ax = plt.subplot()
         self.ax1.plot(time, data_ch1)
         self.ax2.plot(time, data_ch2, 'r-')
-        self.ax1.grid(True)
-        self.ax2.grid(True)
+
+        # Show grid lines
+        self.grid_plot.set_ylim(-4, 4)
+        for i in range(-3, 4):
+            self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
+                                   linewidth=0.5, linestyle=(0, (5, 10)))
 
         # plt.ylabel('Voltaje (V)')
         # plt.xlabel("Tiempo (" + tUnit + ")")
