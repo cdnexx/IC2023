@@ -161,6 +161,10 @@ class App(QtWidgets.QMainWindow):
             31: 5e-09
         }
 
+        # Remove grid lines before changing scale
+        for line in self.plot.grid_plot.lines:
+            line.remove()
+
         self.plot.osc.write(f":TIM:SCAL {scale_value[value]}")
         self.update_scale_label("time", t_value=scale_value[value])
 
@@ -206,6 +210,9 @@ class GraphCanvas(FigureCanvas):
     def __init__(self, parent=None):
         self.fig, self.ax1 = plt.subplots()
         self.ax2 = self.ax1.twinx()
+
+        # Adjust graph margins
+        plt.subplots_adjust(left=0, right=1.02, bottom=0, top=1.02)
 
         # Plot to display the grid
         self.grid_plot = self.ax1.twinx()
@@ -281,10 +288,15 @@ class GraphCanvas(FigureCanvas):
                 self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
                                        linewidth=0.5, linestyle=(0, (5, 10)))
 
+        # Show vertical grid lines
+        for i in range(0, 600, 50):
+            self.grid_plot.axvline(time[i], color=(
+                0, 0, 0, 0.05), linewidth=0.5, linestyle=(0, (5, 10)))
+
         self.ax1.set_ylim(self.ax1_ylim[0], self.ax1_ylim[1])
         self.ax2.set_ylim(self.ax2_ylim[0], self.ax2_ylim[1])
 
-        # Hide ticks
+        # Hide axis ticks
         self.ax1.set_yticks([])
         self.ax2.set_yticks([])
         self.grid_plot.set_yticks([])
