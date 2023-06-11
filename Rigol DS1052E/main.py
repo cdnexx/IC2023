@@ -290,8 +290,12 @@ class GraphCanvas(FigureCanvas):
 
         # Show vertical grid lines
         for i in range(0, 600, 50):
-            self.grid_plot.axvline(time[i], color=(
-                0, 0, 0, 0.05), linewidth=0.5, linestyle=(0, (5, 10)))
+            if i == 300:
+                self.grid_plot.axvline(time[i], color=(0, 0, 0, 0.5),
+                                       linewidth=0.75, linestyle=(0, (5, 10)))
+            else:
+                self.grid_plot.axvline(time[i], color=(0, 0, 0, 0.05),
+                                       linewidth=0.5, linestyle=(0, (5, 10)))
 
         self.ax1.set_ylim(self.ax1_ylim[0], self.ax1_ylim[1])
         self.ax2.set_ylim(self.ax2_ylim[0], self.ax2_ylim[1])
