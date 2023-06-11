@@ -275,8 +275,8 @@ class GraphCanvas(FigureCanvas):
         self.grid_plot.set_ylim(-4, 4)
         for i in range(-3, 4):
             if i == 0:
-                self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
-                                       linewidth=1, linestyle=(0, (5, 10)))
+                self.grid_plot.axhline(i, color=(0, 0, 0, 0.5),
+                                       linewidth=0.75, linestyle=(0, (5, 10)))
             else:
                 self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
                                        linewidth=0.5, linestyle=(0, (5, 10)))
