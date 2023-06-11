@@ -274,10 +274,14 @@ class GraphCanvas(FigureCanvas):
         # Show grid lines
         self.grid_plot.set_ylim(-4, 4)
         for i in range(-3, 4):
-            self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
-                                   linewidth=0.5, linestyle=(0, (5, 10)))
+            if i == 0:
+                self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
+                                       linewidth=1, linestyle=(0, (5, 10)))
+            else:
+                self.grid_plot.axhline(i, color=(0, 0, 0, 0.05),
+                                       linewidth=0.5, linestyle=(0, (5, 10)))
 
-        self.ax1.set_ylim(self.ax1_ylim[0], self.ax2_ylim[1])
+        self.ax1.set_ylim(self.ax1_ylim[0], self.ax1_ylim[1])
         self.ax2.set_ylim(self.ax2_ylim[0], self.ax2_ylim[1])
 
         plt.xlim(time[0], time[-1])
