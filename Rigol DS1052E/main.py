@@ -284,6 +284,12 @@ class GraphCanvas(FigureCanvas):
         self.ax1.set_ylim(self.ax1_ylim[0], self.ax1_ylim[1])
         self.ax2.set_ylim(self.ax2_ylim[0], self.ax2_ylim[1])
 
+        # Hide ticks
+        self.ax1.set_yticks([])
+        self.ax2.set_yticks([])
+        self.grid_plot.set_yticks([])
+        plt.xticks([])
+
         plt.xlim(time[0], time[-1])
 
         self.draw()
