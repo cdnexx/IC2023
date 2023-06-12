@@ -319,6 +319,54 @@ class GraphCanvas(FigureCanvas):
         QtCore.QTimer.singleShot(update_time, self.plot_data)
 
 
+class FFTGraph(FigureCanvas):
+    def __init__(self, parent=None):
+        self.fig, self.ax1 = plt.subplots()
+        self.ax2 = self.ax1.twinx()
+
+        plt.subplots_adjust(left=0, right=1.02, bottom=0, top=1.02)
+
+        super().__init__(self.fig)
+
+        self.rm = pyvisa.ResourceManager()
+        self.osc = self.rm.open_resource('USB0::0x1AB1::0x0588::DS1ET200601265::INSTR',
+                                         timeout=20, chunk_size=1024000)
+
+        self.plot_data()
+
+    def get_channel_data(self, channel: int):
+        # Get volt scale
+        voltscale = float(self.osc.query(f':CHAN{channel}:SCAL?'))  # [0]
+
+        # Get the voltage offset
+        voltoffset = float(self.osc.query(f":CHAN{channel}:OFFS?"))  # [0]
+
+        self.osc.write(f":WAV:DATA? CHAN{channel}")  # Request the data
+        raw_data = self.osc.read_raw()  # Read the data
+        raw_data = raw_data[10:]  # Remove header (first 10 characters)
+
+        data = np.frombuffer(raw_data, 'B')
+        #data = data * -1 + 255
+        #data = (data - 130.0 - voltoffset/voltscale*25) / 25 * voltscale
+
+        return data
+
+    def plot_data(self):
+        data = self.get_channel_data(channel=1)
+        sampling_rate = float(self.osc.query(':ACQ:SAMP?'))
+        freq = np.fft.fftfreq(len(data), d=1/sampling_rate)
+        fft_data = np.abs(np.fft.fft(data))
+
+        self.ax1.plot(freq, fft_data)
+
+        self.draw()
+
+        self.ax1.cla()
+
+        update_time = 100
+        QtCore.QTimer.singleShot(update_time, self.plot_data)
+
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = App()
